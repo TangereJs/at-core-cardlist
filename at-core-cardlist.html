@@ -13,18 +13,8 @@ This code may only be used under the BSD style license found at http://polymer.g
   <style>
     :host {
       width: 100%;
-      display: block;      
+      display: block;
     }
-    
-    .listItem {
-        background: #FFF;
-        padding: 0px;
-        overflow: visible;
-        height: auto;      
-        margin: 10px;
-        border-radius: 2px;
-        box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
-      }
   </style>
   <template>
     <at-core-spinner id="spinner" type="wave"></at-core-spinner>   
@@ -150,10 +140,6 @@ This code may only be used under the BSD style license found at http://polymer.g
         comp = comp.substring(1 + comp.indexOf("/"));
       }
 
-      // create wrapper div
-      var listItem = document.createElement("div");
-      listItem.className = "listItem";
-
       // apply template for each item in items
       //  ... wrap result with card layout div
       //  ... and add to listContainer
@@ -170,11 +156,9 @@ This code may only be used under the BSD style license found at http://polymer.g
 
         var item = document.createElement(comp);
         item.item = this.items[i];
+        item.className = "card"
 
-        var div = listItem.cloneNode(true);
-        div.appendChild(item);
-
-        this.$.cardLayout.append(div);
+        this.$.cardLayout.append(item);
       }
 
       this.indicator = false; // hide indicator before list is rendered
