@@ -1,0 +1,188 @@
+<!--
+Copyright (c) 2014 adenin TECHNOLOGIES. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../at-core-spinner/at-core-spinner.html">
+<link rel="import" href="../at-core-cardlayout/at-core-cardlayout.html">
+<link rel="import" href="../at-carbon-message/at-carbon-message.html">
+
+<dom-module id="at-core-cardlist">
+
+  <style>
+    :host {
+      width: 100%;
+      display: block;      
+    }
+    
+    .listItem {
+        background: #FFF;
+        padding: 0px;
+        overflow: visible;
+        height: auto;      
+        margin: 10px;
+        border-radius: 2px;
+        box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+      }
+  </style>
+  <template>
+    <at-core-spinner id="spinner" type="wave"></at-core-spinner>   
+    <at-carbon-message type="info" id="msgEmptyList"></at-carbon-message>
+    <at-core-cardlayout id="cardLayout"></at-core-cardlayout>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'at-core-cardlist',
+    _scopeCssViaAttr: true,
+    properties: {
+      items: {
+        type: Array
+      },
+      itemComponent: {
+        type: String,
+        value: "",
+        notify: true
+      },
+      cardWidth: {
+        type: Number,
+        value: 320,
+        notify: true
+      },
+      layout: {
+        type: String,
+        value: "card",
+        notify: true
+      },
+      indicator: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true,
+        observer: "changeIndicator"
+      },
+      emptyList: {
+        type: String,
+        value: "No data found"
+      },
+      _initialize: {
+        type: String,
+        value: "",
+        notify: true
+      }
+    },
+
+    observers: [
+      'initialize(items.*,itemComponent, layout, cardWidth, emptyList)'      
+    ],
+
+    changeIndicator: function () {      
+      this.$.spinner.display = this.indicator ? "block" : "none";
+      if (this.indicator) {
+        this.clear();        
+      }
+    },
+
+    clear: function () {
+
+      this.$.msgEmptyList.html = "";  // clear error message
+        
+      Polymer.dom.flush();
+    },
+
+    initialize: function () {
+      
+      var mel = this.$.msgEmptyList;
+      mel.html = "";
+      
+      // show error if items is an empty array
+      if (this.items.constructor == Array && this.items.length == 0) {
+        mel.html = this.emptyList;
+      }
+
+      if (!this.items || (!this.template && !this.itemComponent)) {
+        return;
+      }
+
+      if (!!this.itemComponent) {
+
+        // dynamically load item-component
+
+        // load item-component from other component (itemComponent = component-name/item-component) or from localfolder (item-component)
+        var compUrl = document.baseURI.toLowerCase().indexOf("/components/") >= 0 ? "../" : "components/";
+        if (document.URL.indexOf("/elements/designer-element/") >= 0) compUrl = "/components/"; // standalone designer preview?
+
+        if (window.ComponentsBase != undefined) compUrl = window.ComponentsBase;
+
+        var compName = this.itemComponent;
+        var importPath = compName.indexOf("/") >= 0 ? compUrl + compName + ".html" : compName + ".html";
+
+        this.importHref(importPath, function () {
+          this.bindItems();
+        }, function () {
+          Polymer.signal("busy-end");          
+          alert(window.location.href + "\n\nERROR: failed to load list item " + this.itemComponent);
+          location.hash = ""; // clear current hash 
+          location.reload(); // go to start app by reloading without hash
+        });
+        
+
+      } else {
+        // with inline template binding can happen immediately
+        this.bindItems();
+      }
+    },
+
+    bindItems: function () {
+
+      if (!this.items || (!this.template && !this.itemComponent)) {
+        return;
+      }
+
+      Polymer.dom.flush();
+
+      // create list container
+      var fragment = document.createDocumentFragment();
+
+      var comp = this.itemComponent;
+      if (comp.indexOf("/") > 0) {
+        comp = comp.substring(1 + comp.indexOf("/"));
+      }
+
+      // create wrapper div
+      var listItem = document.createElement("div");
+      listItem.className = "listItem";
+
+      // apply template for each item in items
+      //  ... wrap result with card layout div
+      //  ... and add to listContainer
+
+      var item = null;
+
+      // create component element
+      var comp = this.itemComponent;
+      if (comp.indexOf("/") > 0) {
+        comp = comp.substring(1 + comp.indexOf("/"));
+      }
+      
+      for (var i = 0; i < this.items.length; i++) {
+
+        var item = document.createElement(comp);
+        item.item = this.items[i];
+
+        var div = listItem.cloneNode(true);
+        div.appendChild(item);
+
+        this.$.cardLayout.append(div);
+      }
+
+      this.indicator = false; // hide indicator before list is rendered
+        
+      this.fire("list-ready");
+    },
+
+    ready: function () {
+    }
+  });
+</script>
