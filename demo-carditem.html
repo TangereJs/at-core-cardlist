@@ -11,8 +11,7 @@
     <style>
       :host {
         display: block;
-        box-sizing: border-box;      
-        height: 120px;
+        box-sizing: border-box;              
       }
 
       .card {
@@ -71,7 +70,7 @@
           <div class="container">
             <div class="item">
               <div class="content">
-                <at-carbon-clamp lines="2">{{title}}</at-carbon-clamp>
+                <at-carbon-clamp lines="3">{{title}}</at-carbon-clamp>
                 <div class="title">{{description}}</div>
                 <at-carbon-moment class="title" datetime="{{date}}" utc from-now auto-refresh-rate="10"></at-carbon-moment>
               </div>

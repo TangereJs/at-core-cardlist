@@ -20,7 +20,9 @@
     var strings = [
           "PARKOUR!",
           "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit. Lorem est qui dolorem ipsum quia. ",
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+          "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea. Lorem est qui dolorem ipsum quia, takimata sanctus est Lorem ipsum dolor sit amet."
         ];
 
     var namegen = {
@@ -67,7 +69,7 @@
             index: i,
             description: name,
             divider: divider,
-            title: strings[i % 3],
+            title: strings[i % 5],
             date: age.toISOString()
           });
         }
