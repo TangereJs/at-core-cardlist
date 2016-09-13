@@ -1,22 +1,25 @@
 <!--
-Copyright (c) 2014 adenin TECHNOLOGIES. All rights reserved.
+Copyright (c) 2014-2016 adenin TECHNOLOGIES. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 -->
 
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../tangere/tangere.html">
 <link rel="import" href="../at-core-spinner/at-core-spinner.html">
 <link rel="import" href="../at-core-cardlayout/at-core-cardlayout.html">
 <link rel="import" href="../at-carbon-message/at-carbon-message.html">
+<link rel="import" href="../at-theme/at-theme.html">
 
 <dom-module id="at-core-cardlist">
 
+
+  <template>
+ <style include="card-common"></style>
   <style>
     :host {
       width: 100%;
       display: block;
     }
   </style>
-  <template>
     <at-core-spinner id="spinner" type="wave"></at-core-spinner>   
     <at-carbon-message type="info" id="msgEmptyList"></at-carbon-message>
     <at-core-cardlayout id="cardLayout"></at-core-cardlayout>
@@ -25,8 +28,7 @@ This code may only be used under the BSD style license found at http://polymer.g
 
 <script>
   Polymer({
-    is: 'at-core-cardlist',
-    _scopeCssViaAttr: true,
+    is: 'at-core-cardlist',    
     properties: {
       items: {
         type: Array
@@ -46,6 +48,13 @@ This code may only be used under the BSD style license found at http://polymer.g
         value: "card",
         notify: true
       },
+      view: {
+        type: String,
+        value: "",
+        notify: true,
+        xtype: "code",
+        mode: "liquid"
+      },
       indicator: {
         type: Boolean,
         value: false,
@@ -64,13 +73,13 @@ This code may only be used under the BSD style license found at http://polymer.g
     },
 
     observers: [
-      'initialize(items.*,itemComponent, layout, cardWidth, emptyList)'      
+      'initialize(items.*,itemComponent, layout, cardWidth, emptyList, view)'      
     ],
 
-    changeIndicator: function () {      
+    changeIndicator: function () {
       this.$.spinner.display = this.indicator ? "block" : "none";
       if (this.indicator) {
-        this.clear();        
+        this.clear();
       }
     },
 
@@ -82,20 +91,20 @@ This code may only be used under the BSD style license found at http://polymer.g
     },
 
     initialize: function () {
-      
+
       var mel = this.$.msgEmptyList;
       mel.html = "";
-      
+
       // show error if items is an empty array
       if (this.items.constructor == Array && this.items.length == 0) {
         mel.html = this.emptyList;
       }
 
-      if (!this.items || (!this.template && !this.itemComponent)) {
+      if (!this.items || (!this.view && !this.itemComponent)) {
         return;
       }
 
-      if (!!this.itemComponent) {
+      if (!!this.itemComponent || !!this.view) {
 
         // dynamically load item-component
 
@@ -105,18 +114,18 @@ This code may only be used under the BSD style license found at http://polymer.g
 
         if (window.ComponentsBase != undefined) compUrl = window.ComponentsBase;
 
-        var compName = this.itemComponent;
+        var compName = this.itemComponent ? this.itemComponent : "at-core-view/at-core-view";
         var importPath = compName.indexOf("/") >= 0 ? compUrl + compName + ".html" : compName + ".html";
 
         this.importHref(importPath, function () {
           this.bindItems();
         }, function () {
-          Polymer.signal("busy-end");          
+          Polymer.signal("busy-end");
           alert(window.location.href + "\n\nERROR: failed to load list item " + this.itemComponent);
           location.hash = ""; // clear current hash 
           location.reload(); // go to start app by reloading without hash
         });
-        
+
 
       } else {
         // with inline template binding can happen immediately
@@ -126,7 +135,7 @@ This code may only be used under the BSD style license found at http://polymer.g
 
     bindItems: function () {
 
-      if (!this.items || (!this.template && !this.itemComponent)) {
+      if (!this.items || (!this.view && !this.itemComponent)) {
         return;
       }
 
@@ -147,7 +156,7 @@ This code may only be used under the BSD style license found at http://polymer.g
       var item = null;
 
       // create component element
-      var comp = this.itemComponent;
+      var comp = this.itemComponent ? this.itemComponent : "at-core-view";
       if (comp.indexOf("/") > 0) {
         comp = comp.substring(1 + comp.indexOf("/"));
       }
@@ -155,11 +164,24 @@ This code may only be used under the BSD style license found at http://polymer.g
       for (var i = 0; i < this.items.length; i++) {
 
         var item = document.createElement(comp);
-        item.item = this.items[i];
-        item.className = "card"
+        
+        if(this.view) {
+          item.view = this.view;
+          item.value = this.items[i];
+        } else {
+          item.item = this.items[i];
+        }
 
+        item.className = "card"
         this.$.cardLayout.append(item);
       }
+      
+      this.$.cardLayout.updateLayout();
+
+      // run again to optimize layout when first layout caused e.g. Chrome scrollbar to use/free screen width
+      setTimeout(function () {            
+        this.$.cardLayout.updateLayout();
+      }.bind(this), 200);
 
       this.indicator = false; // hide indicator before list is rendered
         
