@@ -86,7 +86,7 @@ This code may only be used under the BSD style license found at http://polymer.g
     clear: function () {
 
       this.$.msgEmptyList.html = "";  // clear error message
-        
+      this.$.cardLayout.clear();
       Polymer.dom.flush();
     },
 
@@ -181,11 +181,11 @@ This code may only be used under the BSD style license found at http://polymer.g
       // run again to optimize layout when first layout caused e.g. Chrome scrollbar to use/free screen width
       setTimeout(function () {            
         this.$.cardLayout.updateLayout();
+        this.fire("list-ready");
       }.bind(this), 200);
 
-      this.indicator = false; // hide indicator before list is rendered
-        
-      this.fire("list-ready");
+      this.indicator = false; // hide indicator before list is rendered       
+      
     },
 
     ready: function () {
