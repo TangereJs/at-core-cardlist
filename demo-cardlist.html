@@ -1,3 +1,4 @@
+<link rel="import" href="../tangere/tangere.html">
 <link rel="import" href="at-core-cardlist.html">
 
 <dom-module id="demo-cardlist">
@@ -45,7 +46,7 @@
         this.data = this.generateData();
       },
       properties: {
-        data: { type: Object }  
+        data: { type: Object }
       },
       generateData: function () {
         var names = [],
@@ -62,9 +63,9 @@
           }
           var age = new Date();
           age.setMinutes(age.getMinutes() - i + 10);
-          
+
           //  <img class="ui avatar image" src="images/{{ index | modulo:4 }}.png">
-          
+
           data.push({
             index: i,
             description: name,
@@ -81,5 +82,3 @@
     });
   })();
 </script>
-
-

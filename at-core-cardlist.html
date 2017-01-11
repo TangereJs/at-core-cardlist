@@ -10,17 +10,15 @@ This code may only be used under the BSD style license found at http://polymer.g
 <link rel="import" href="../at-theme/at-theme.html">
 
 <dom-module id="at-core-cardlist">
-
-
   <template>
- <style include="card-common"></style>
-  <style>
-    :host {
-      width: 100%;
-      display: block;
-    }
-  </style>
-    <at-core-spinner id="spinner" type="wave"></at-core-spinner>   
+    <style include="card-common"></style>
+    <style>
+      :host {
+        width: 100%;
+        display: block;
+      }
+    </style>
+    <at-core-spinner id="spinner" type="wave"></at-core-spinner>
     <at-carbon-message type="info" id="msgEmptyList"></at-carbon-message>
     <at-core-cardlayout id="cardLayout"></at-core-cardlayout>
   </template>
@@ -28,7 +26,7 @@ This code may only be used under the BSD style license found at http://polymer.g
 
 <script>
   Polymer({
-    is: 'at-core-cardlist',    
+    is: 'at-core-cardlist',
     properties: {
       items: {
         type: Array
@@ -73,24 +71,24 @@ This code may only be used under the BSD style license found at http://polymer.g
     },
 
     observers: [
-      'initialize(items.*,itemComponent, layout, cardWidth, emptyList, view)'      
+      'initialize(items.*,itemComponent, layout, cardWidth, emptyList, view)'
     ],
 
-    changeIndicator: function () {
+    changeIndicator: function() {
       this.$.spinner.display = this.indicator ? "block" : "none";
       if (this.indicator) {
         this.clear();
       }
     },
 
-    clear: function () {
+    clear: function() {
 
-      this.$.msgEmptyList.html = "";  // clear error message
+      this.$.msgEmptyList.html = ""; // clear error message
       this.$.cardLayout.clear();
       Polymer.dom.flush();
     },
 
-    initialize: function () {
+    initialize: function() {
 
       var mel = this.$.msgEmptyList;
       mel.html = "";
@@ -117,12 +115,12 @@ This code may only be used under the BSD style license found at http://polymer.g
         var compName = this.itemComponent ? this.itemComponent : "at-core-view/at-core-view";
         var importPath = compName.indexOf("/") >= 0 ? compUrl + compName + ".html" : compName + ".html";
 
-        this.importHref(importPath, function () {
+        this.importHref(importPath, function() {
           this.bindItems();
-        }, function () {
+        }, function() {
           Polymer.signal("busy-end");
           alert(window.location.href + "\n\nERROR: failed to load list item " + this.itemComponent);
-          location.hash = ""; // clear current hash 
+          location.hash = ""; // clear current hash
           location.reload(); // go to start app by reloading without hash
         });
 
@@ -133,7 +131,7 @@ This code may only be used under the BSD style license found at http://polymer.g
       }
     },
 
-    bindItems: function () {
+    bindItems: function() {
 
       if (!this.items || (!this.view && !this.itemComponent)) {
         return;
@@ -160,12 +158,12 @@ This code may only be used under the BSD style license found at http://polymer.g
       if (comp.indexOf("/") > 0) {
         comp = comp.substring(1 + comp.indexOf("/"));
       }
-      
+
       for (var i = 0; i < this.items.length; i++) {
 
         var item = document.createElement(comp);
-        
-        if(this.view) {
+
+        if (this.view) {
           item.view = this.view;
           item.value = this.items[i];
         } else {
@@ -175,20 +173,19 @@ This code may only be used under the BSD style license found at http://polymer.g
         item.className = "card"
         this.$.cardLayout.append(item);
       }
-      
+
       this.$.cardLayout.updateLayout();
 
       // run again to optimize layout when first layout caused e.g. Chrome scrollbar to use/free screen width
-      setTimeout(function () {            
+      setTimeout(function() {
         this.$.cardLayout.updateLayout();
         this.fire("list-ready");
       }.bind(this), 200);
 
-      this.indicator = false; // hide indicator before list is rendered       
-      
+      this.indicator = false; // hide indicator before list is rendered
+
     },
 
-    ready: function () {
-    }
+    ready: function() {}
   });
 </script>
