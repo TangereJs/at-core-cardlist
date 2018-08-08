@@ -168,7 +168,7 @@ This code may only be used under the BSD style license found at http://polymer.g
           item.item = this.items[i];
         }
 
-        item.className = "card"
+        this._setClassList(item, "card");
         this.$.cardLayout.append(item);
       }
 
